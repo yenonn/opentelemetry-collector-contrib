@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/collector/config/configtls"
 	"go.opentelemetry.io/collector/exporter/exportertest"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/rabbitmqexporter/internal/metadata"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/metadata"
 )
 
 func TestCreateDefaultConfig(t *testing.T) {
@@ -62,7 +62,7 @@ func TestCreateMetricsWithConnectionName(t *testing.T) {
 func TestCreateExporterWithCustomRoutingKey(t *testing.T) {
 	factory := NewFactory()
 	cfg := factory.CreateDefaultConfig().(*Config)
-	cfg.Routing.RoutingKey = "custom_routing_key"
+	cfg.Topic.Subject = "custom_subject"
 
 	te, err := factory.CreateLogs(context.Background(), exportertest.NewNopSettings(metadata.Type), cfg)
 	assert.NoError(t, err)

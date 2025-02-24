@@ -8,7 +8,7 @@ import (
 )
 
 type INatsClient interface {
-	Connect(config *DialConfig) error
+	Connect(config *NatsConfig) error
 	Close() error
 	IsCclose() bool
 	IsConnected() bool
