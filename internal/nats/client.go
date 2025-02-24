@@ -7,8 +7,11 @@ import (
 	"go.uber.org/zap"
 )
 
-type NatsClient interface {
-	DialConfig(config DialConfig) error
+type INatsClient interface {
+	Connect(config *DialConfig) error
+	Close()
+	IsCclose() bool
+	IsConnected() bool
 }
 
 type DialConfig struct {
@@ -29,12 +32,16 @@ func DefaultDialConfig() *DialConfig {
 	}
 }
 
-type client struct {
+type NatsClient struct {
 	logger     *zap.Logger
 	Connection *nats.Conn
 }
 
-func (c *client) Connect(config DialConfig) error {
+func NewNatsClient() *NatsClient {
+	return &NatsClient{}
+}
+
+func (c *NatsClient) Connect(config *DialConfig) error {
 	c.logger.Debug("Connecting to nats")
 
 	natsOptions := []nats.Option{
@@ -52,17 +59,17 @@ func (c *client) Connect(config DialConfig) error {
 	return nil
 }
 
-func (c *client) Closed() {
+func (c *NatsClient) Close() {
 	c.logger.Debug("Disconnecting nats")
 	c.Connection.Flush()
 	c.Connection.Drain()
 	c.Connection.Close()
 }
 
-func (c *client) IsClosed() bool {
+func (c *NatsClient) IsClosed() bool {
 	return c.Connection.IsClosed()
 }
 
-func (c *client) IsConnected() bool {
+func (c *NatsClient) IsConnected() bool {
 	return c.Connection.IsConnected()
 }

@@ -14,26 +14,21 @@ import (
 
 type Config struct {
 	Connection          ConnectionConfig          `mapstructure:"connection"`
-	Routing             RoutingConfig             `mapstructure:"routing"`
+	Topic               TopicConfig               `mapstructure:"topic"`
 	EncodingExtensionID *component.ID             `mapstructure:"encoding_extension"`
-	Durable             bool                      `mapstructure:"durable"`
 	RetrySettings       configretry.BackOffConfig `mapstructure:"retry_on_failure"`
 }
 
 type ConnectionConfig struct {
-	Endpoint                   string                  `mapstructure:"endpoint"`
-	VHost                      string                  `mapstructure:"vhost"`
-	TLSConfig                  *configtls.ClientConfig `mapstructure:"tls"`
-	Auth                       AuthConfig              `mapstructure:"auth"`
-	ConnectionTimeout          time.Duration           `mapstructure:"connection_timeout"`
-	Heartbeat                  time.Duration           `mapstructure:"heartbeat"`
-	PublishConfirmationTimeout time.Duration           `mapstructure:"publish_confirmation_timeout"`
-	Name                       string                  `mapstructure:"name"`
+	Endpoint          string                  `mapstructure:"endpoint"`
+	TLSConfig         *configtls.ClientConfig `mapstructure:"tls"`
+	Auth              AuthConfig              `mapstructure:"auth"`
+	ConnectionTimeout time.Duration           `mapstructure:"connection_timeout"`
+	Name              string                  `mapstructure:"name"`
 }
 
-type RoutingConfig struct {
-	Exchange   string `mapstructure:"exchange"`
-	RoutingKey string `mapstructure:"routing_key"`
+type TopicConfig struct {
+	Subject string `mapstructure:"subject"`
 }
 
 type AuthConfig struct {
