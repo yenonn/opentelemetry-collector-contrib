@@ -25,10 +25,10 @@ type Publisher interface {
 type NatsPublisher struct {
 	logger *zap.Logger
 	client *nats.NatsClient
-	config nats.DialConfig
+	config nats.NatsConfig
 }
 
-func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.DialConfig) (Publisher, error) {
+func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.NatsConfig) (Publisher, error) {
 	p := &NatsPublisher{
 		logger: logger,
 		client: client,

@@ -14,7 +14,7 @@ type INatsClient interface {
 	IsConnected() bool
 }
 
-type DialConfig struct {
+type NatsConfig struct {
 	URL               string
 	ConnectionTimeout time.Duration
 	Username          string
@@ -22,8 +22,8 @@ type DialConfig struct {
 	RootCA            string
 }
 
-func DefaultDialConfig() *DialConfig {
-	return &DialConfig{
+func DefaultDialConfig() *NatsConfig {
+	return &NatsConfig{
 		URL:               "nats://localhost:4222",
 		ConnectionTimeout: 5 * time.Second,
 		Username:          "",
@@ -43,7 +43,7 @@ func NewNatsClient(logger *zap.Logger) *NatsClient {
 	}
 }
 
-func (c *NatsClient) Connect(config DialConfig) (*nats.Conn, error) {
+func (c *NatsClient) Connect(config NatsConfig) (*nats.Conn, error) {
 	c.logger.Debug("Connecting to nats")
 
 	natsOptions := []nats.Option{

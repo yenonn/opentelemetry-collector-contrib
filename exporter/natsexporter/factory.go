@@ -142,7 +142,7 @@ func getTopicSubjectOrDefault(config *Config, fallback string) string {
 }
 
 func newPublisherFactory(set exporter.Settings) publisherFactory {
-	return func(dialConfig nats.DialConfig) (publisher.Publisher, error) {
-		return publisher.NewNatsPublisher(set.Logger, nats.NewNatsClient(set.Logger), dialConfig)
+	return func(natsConfig nats.NatsConfig) (publisher.Publisher, error) {
+		return publisher.NewNatsPublisher(set.Logger, nats.NewNatsClient(set.Logger), natsConfig)
 	}
 }

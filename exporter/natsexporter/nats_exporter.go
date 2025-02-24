@@ -27,7 +27,7 @@ type natsExporter struct {
 }
 
 type (
-	publisherFactory = func(nats.DialConfig) (publisher.Publisher, error)
+	publisherFactory = func(nats.NatsConfig) (publisher.Publisher, error)
 	tlsFactory       = func(context.Context) (*tls.Config, error)
 )
 
@@ -47,7 +47,7 @@ func (e *natsExporter) start(ctx context.Context, host component.Host) error {
 		return err
 	}
 	e.marshaler = m
-	dailConfig := nats.DialConfig{
+	natsConfig := nats.NatsConfig{
 		URL:               e.config.Connection.Endpoint,
 		Username:          e.config.Connection.Auth.Plain.Username,
 		Password:          e.config.Connection.Auth.Plain.Password,
@@ -55,7 +55,7 @@ func (e *natsExporter) start(ctx context.Context, host component.Host) error {
 		RootCA:            e.config.Connection.TLSConfig.CAFile,
 	}
 	e.settings.Logger.Info("Establishing initial connection to NATS")
-	p, err := e.publisherFactory(dailConfig)
+	p, err := e.publisherFactory(natsConfig)
 	e.publisher = p
 
 	if err != nil {
