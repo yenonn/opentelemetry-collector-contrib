@@ -37,11 +37,13 @@ type NatsClient struct {
 	Connection *nats.Conn
 }
 
-func NewNatsClient() *NatsClient {
-	return &NatsClient{}
+func NewNatsClient(logger *zap.Logger) *NatsClient {
+	return &NatsClient{
+		logger: logger
+	}
 }
 
-func (c *NatsClient) Connect(config *DialConfig) error {
+func (c *NatsClient) Connect(config DialConfig) error {
 	c.logger.Debug("Connecting to nats")
 
 	natsOptions := []nats.Option{

@@ -23,23 +23,25 @@ type Publisher interface {
 
 type NatsPublisher struct {
 	logger *zap.Logger
-	client nats.NatsClient
+	client *nats.NatsClient
+	config nats.DialConfig
 }
 
-func NewNatsPublisher() *NatsPublisher {
-	return &NatsPublisher{
-		logger: zap.NewNop(),
-		client: *nats.NewNatsClient(),
+func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.DialConfig) (Publisher, error) {
+	p := NatsPublisher{
+		logger: logger,
+		client: client,
+		config: config,
 	}
+	conn, err := p.client.Connect(config)
+	if err != nil {
+		return p, err
+	}
+	p.client.Connection = conn
+	return p, nil
 }
 
 func (p *NatsPublisher) Publish(ctx context.Context, message *Message) error {
-	config := nats.DefaultDialConfig()
-
-	err := p.client.Connect(config)
-	if err != nil {
-		p.logger.Error("Failed to connect to nats", zap.Error(err))
-	}
 	if p.client.IsConnected() {
 		err := p.client.Connection.Publish(message.Subject, message.Body)
 		if err != nil {
@@ -51,12 +53,6 @@ func (p *NatsPublisher) Publish(ctx context.Context, message *Message) error {
 }
 
 func (p *NatsPublisher) PublishMessages(ctx context.Context, messages []*Message) error {
-	config := nats.DefaultDialConfig()
-
-	err := p.client.Connect(config)
-	if err != nil {
-		p.logger.Error("Failed to connect to nats", zap.Error(err))
-	}
 	if p.client.IsConnected() {
 		for _, message := range messages {
 			err := p.client.Connection.Publish(message.Subject, message.Body)

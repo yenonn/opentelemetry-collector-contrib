@@ -5,7 +5,6 @@ package natsexporter // import "github.com/open-telemetry/opentelemetry-collecto
 
 import (
 	"context"
-	"crypto/tls"
 	"time"
 
 	"go.opentelemetry.io/collector/component"
@@ -16,7 +15,7 @@ import (
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/metadata"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/publisher"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/rabbitmq"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/nats"
 )
 
 const (
@@ -24,9 +23,9 @@ const (
 	defaultConnectionHeartbeat        = time.Second * 5
 	defaultPublishConfirmationTimeout = time.Second * 5
 
-	spansRoutingKey   = "otlp_spans"
-	metricsRoutingKey = "otlp_metrics"
-	logsRoutingKey    = "otlp_logs"
+	deadletterMetricsSubject = "deadletter.otlp_metrics"
+	deadletterSpansSubject   = "deadletter.otlp_spans"
+	deadletterLogsSubject    = "deadletter.otlp_logs"
 
 	defaultSpansConnectionName   = "otel-collector-spans"
 	defaultMetricsConnectionName = "otel-collector-metrics"
@@ -48,12 +47,9 @@ func createDefaultConfig() component.Config {
 		Enabled: false,
 	}
 	return &Config{
-		Durable:       true,
 		RetrySettings: retrySettings,
 		Connection: ConnectionConfig{
-			ConnectionTimeout:          defaultConnectionTimeout,
-			Heartbeat:                  defaultConnectionHeartbeat,
-			PublishConfirmationTimeout: defaultPublishConfirmationTimeout,
+			ConnectionTimeout: defaultConnectionTimeout,
 		},
 	}
 }
@@ -65,12 +61,12 @@ func createTracesExporter(
 ) (exporter.Traces, error) {
 	config := cfg.(*Config)
 
-	routingKey := getRoutingKeyOrDefault(config, spansRoutingKey)
+	spansSubject := getTopicSubjectOrDefault(config, deadletterSpansSubject)
 	connectionName := defaultSpansConnectionName
 	if config.Connection.Name != "" {
 		connectionName = config.Connection.Name
 	}
-	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
+	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), spansSubject, connectionName)
 
 	return exporterhelper.NewTraces(
 		ctx,
@@ -91,13 +87,13 @@ func createMetricsExporter(
 ) (exporter.Metrics, error) {
 	config := (cfg.(*Config))
 
-	routingKey := getRoutingKeyOrDefault(config, metricsRoutingKey)
+	metricsSubject := getTopicSubjectOrDefault(config, deadletterMetricsSubject)
 
 	connectionName := defaultMetricsConnectionName
 	if config.Connection.Name != "" {
 		connectionName = config.Connection.Name
 	}
-	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
+	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), metricsSubject, connectionName)
 
 	return exporterhelper.NewMetrics(
 		ctx,
@@ -118,12 +114,12 @@ func createLogsExporter(
 ) (exporter.Logs, error) {
 	config := (cfg.(*Config))
 
-	routingKey := getRoutingKeyOrDefault(config, logsRoutingKey)
+	logsSubject := getTopicSubjectOrDefault(config, deadletterLogsSubject)
 	connectionName := defaultLogsConnectionName
 	if config.Connection.Name != "" {
 		connectionName = config.Connection.Name
 	}
-	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
+	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), logsSubject, connectionName)
 
 	return exporterhelper.NewLogs(
 		ctx,
@@ -137,25 +133,16 @@ func createLogsExporter(
 	)
 }
 
-func getRoutingKeyOrDefault(config *Config, fallback string) string {
-	routingKey := fallback
-	if config.Routing.RoutingKey != "" {
-		routingKey = config.Routing.RoutingKey
+func getTopicSubjectOrDefault(config *Config, fallback string) string {
+	subject := fallback
+	if config.Topic.Subject != "" {
+		subject = config.Topic.Subject
 	}
-	return routingKey
+	return subject
 }
 
 func newPublisherFactory(set exporter.Settings) publisherFactory {
-	return func(dialConfig publisher.DialConfig) (publisher.Publisher, error) {
-		return publisher.NewConnection(set.Logger, rabbitmq.NewAmqpClient(set.Logger), dialConfig)
-	}
-}
-
-func newTLSFactory(config *Config) tlsFactory {
-	if config.Connection.TLSConfig != nil {
-		return config.Connection.TLSConfig.LoadTLSConfig
-	}
-	return func(context.Context) (*tls.Config, error) {
-		return nil, nil
+	return func(dialConfig nats.DialConfig) (publisher.Publisher, error) {
+		return publisher.NewNatsPublisher(set.Logger, nats.NewNatsClient(set.Logger), dialConfig)
 	}
 }
