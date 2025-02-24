@@ -9,7 +9,7 @@ import (
 
 type INatsClient interface {
 	Connect(config *DialConfig) error
-	Close()
+	Close() error
 	IsCclose() bool
 	IsConnected() bool
 }
@@ -61,11 +61,18 @@ func (c *NatsClient) Connect(config DialConfig) (*nats.Conn, error) {
 	return c.Connection, nil
 }
 
-func (c *NatsClient) Close() {
+func (c *NatsClient) Close() error {
 	c.logger.Debug("Disconnecting nats")
-	c.Connection.Flush()
-	c.Connection.Drain()
+	err := c.Connection.Flush()
+	if err != nil {
+		return err
+	}
+	err = c.Connection.Drain()
+	if err != nil {
+		return nil
+	}
 	c.Connection.Close()
+	return nil
 }
 
 func (c *NatsClient) IsClosed() bool {

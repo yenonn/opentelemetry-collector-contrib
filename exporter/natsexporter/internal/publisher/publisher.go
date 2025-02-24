@@ -19,7 +19,7 @@ type Message struct {
 type Publisher interface {
 	Publish(ctx context.Context, message *Message) error
 	PublishMessages(ctx context.Context, messages []*Message) error
-	Close()
+	Close() error
 }
 
 type NatsPublisher struct {
@@ -79,6 +79,6 @@ func (p *NatsPublisher) IsClosed() bool {
 	return p.client.IsClosed()
 }
 
-func (p *NatsPublisher) Close() {
-	p.client.Close()
+func (p *NatsPublisher) Close() error {
+	return p.client.Close()
 }
