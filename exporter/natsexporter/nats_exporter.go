@@ -33,8 +33,8 @@ type (
 	tlsFactory       = func(context.Context) (*tls.Config, error)
 )
 
-func newNatsExporter(cfg *Config, set component.TelemetrySettings, publisherFactory publisherFactory, tlsFactory tlsFactory, routingKey string, connectionName string) *rabbitmqExporter {
-	exporter := &rabbitmqExporter{
+func newNatsExporter(cfg *Config, set component.TelemetrySettings, publisherFactory publisherFactory, tlsFactory tlsFactory, routingKey string, connectionName string) *natsExporter {
+	exporter := &natsExporter{
 		config:           cfg,
 		settings:         set,
 		routingKey:       routingKey,
