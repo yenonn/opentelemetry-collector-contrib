@@ -28,7 +28,7 @@ type NatsPublisher struct {
 }
 
 func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.DialConfig) (Publisher, error) {
-	p := NatsPublisher{
+	p := &NatsPublisher{
 		logger: logger,
 		client: client,
 		config: config,
