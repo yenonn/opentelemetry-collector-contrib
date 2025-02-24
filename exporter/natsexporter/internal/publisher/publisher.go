@@ -5,6 +5,7 @@ package publisher
 
 import (
 	"context"
+	"errors"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/nats"
 	"go.uber.org/zap"
@@ -48,6 +49,8 @@ func (p *NatsPublisher) Publish(ctx context.Context, message *Message) error {
 			p.logger.Error("Failed to publish message", zap.Error(err))
 			return err
 		}
+	} else {
+		p.logger.Error("Failed to publish message, client is not connected", zap.Error(errors.New("fail to connect")))
 	}
 	return nil
 }
@@ -61,7 +64,10 @@ func (p *NatsPublisher) PublishMessages(ctx context.Context, messages []*Message
 				return nil
 			}
 		}
+	} else {
+		p.logger.Error("Failed to publish messages, client is not connected", zap.Error(errors.New("fail to connect")))
 	}
+
 	return nil
 }
 
