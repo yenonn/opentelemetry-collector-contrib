@@ -25,7 +25,7 @@ This component expects that subject.
 The following settings can be configured:
 
 - `connection`:
-  - `endpoint` (required, ex = amqp://localhost:5672): Endpoint to connect to RabbitMQ
+  - `endpoint` (required, ex = nats://localhost:4222): Endpoint to connect to NATS
   - `auth`:
     - `plain`: Configuration if using SASL PLAIN authentication
       - `username` (required): username for authentication
@@ -44,7 +44,7 @@ Example config:
 exporters:
   nats:
     connection:
-      endpoint: amqp://localhost:5672
+      endpoint: nats://localhost:4222
       topic:
         subject: foo.bar
       auth:
