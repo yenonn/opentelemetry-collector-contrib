@@ -18,7 +18,7 @@ type Message struct {
 type Publisher interface {
 	Publish(ctx context.Context, message *Message) error
 	PublishMessages(ctx context.Context, messages []*Message) error
-	Close() error
+	Close()
 }
 
 type NatsPublisher struct {
@@ -35,7 +35,7 @@ func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.D
 	}
 	conn, err := p.client.Connect(config)
 	if err != nil {
-		return p, err
+		return nil, err
 	}
 	p.client.Connection = conn
 	return p, nil

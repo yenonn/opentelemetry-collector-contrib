@@ -39,11 +39,11 @@ type NatsClient struct {
 
 func NewNatsClient(logger *zap.Logger) *NatsClient {
 	return &NatsClient{
-		logger: logger
+		logger: logger,
 	}
 }
 
-func (c *NatsClient) Connect(config DialConfig) error {
+func (c *NatsClient) Connect(config DialConfig) (*nats.Conn, error) {
 	c.logger.Debug("Connecting to nats")
 
 	natsOptions := []nats.Option{
@@ -55,10 +55,10 @@ func (c *NatsClient) Connect(config DialConfig) error {
 	nc, err := nats.Connect(config.URL, natsOptions...)
 	if err != nil {
 		nc.Close()
-		return err
+		return nil, err
 	}
 	c.Connection = nc
-	return nil
+	return c.Connection, nil
 }
 
 func (c *NatsClient) Close() {
