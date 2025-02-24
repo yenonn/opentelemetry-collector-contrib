@@ -1,4 +1,4 @@
-type: rabbitmq
+type: nats
 
 status:
   class: exporter
@@ -6,9 +6,10 @@ status:
     alpha: [traces, metrics, logs]
   distributions: [contrib]
   codeowners:
-    active: [swar8080, atoulme]
+    active: [yenonn]
 
 tests:
   # Needed because the component intentionally fails during start-up if unable to connect to rabbitmq broker
   skip_lifecycle: true
   skip_shutdown: false
+

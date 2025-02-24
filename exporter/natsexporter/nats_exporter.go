@@ -5,7 +5,6 @@ package natsexporter // import "github.com/open-telemetry/opentelemetry-collecto
 
 import (
 	"context"
-	"crypto/tls"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -26,10 +25,7 @@ type natsExporter struct {
 	publisher publisher.Publisher
 }
 
-type (
-	publisherFactory = func(nats.NatsConfig) (publisher.Publisher, error)
-	tlsFactory       = func(context.Context) (*tls.Config, error)
-)
+type publisherFactory = func(nats.NatsConfig) (publisher.Publisher, error)
 
 func newNatsExporter(cfg *Config, set component.TelemetrySettings, publisherFactory publisherFactory, subject string, connectionName string) *natsExporter {
 	exporter := &natsExporter{

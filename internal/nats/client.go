@@ -22,9 +22,9 @@ type NatsConfig struct {
 	RootCA            string
 }
 
-func DefaultDialConfig() *NatsConfig {
+func DefaultNatsConfig() *NatsConfig {
 	return &NatsConfig{
-		URL:               "nats://localhost:4222",
+		URL:               nats.DefaultURL,
 		ConnectionTimeout: 5 * time.Second,
 		Username:          "",
 		Password:          "",

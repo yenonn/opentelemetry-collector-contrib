@@ -17,10 +17,10 @@ import (
 	"go.opentelemetry.io/collector/confmap/confmaptest"
 	"go.opentelemetry.io/collector/confmap/xconfmap"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/rabbitmqexporter/internal/metadata"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/metadata"
 )
 
-var encodingComponentID = component.NewIDWithName(component.MustNewType("otlp_encoding"), "rabbitmq123")
+var encodingComponentID = component.NewIDWithName(component.MustNewType("otlp_encoding"), "nats123")
 
 func TestLoadConfig(t *testing.T) {
 	t.Parallel()
@@ -45,8 +45,7 @@ func TestLoadConfig(t *testing.T) {
 			id: component.NewIDWithName(metadata.Type, "all_fields"),
 			expected: &Config{
 				Connection: ConnectionConfig{
-					Endpoint: "amqps://localhost:5672",
-					VHost:    "vhost1",
+					Endpoint: "nats://localhost:4222",
 					Auth: AuthConfig{
 						Plain: PlainAuth{
 							Username: "user",
@@ -59,16 +58,12 @@ func TestLoadConfig(t *testing.T) {
 						},
 						Insecure: true,
 					},
-					ConnectionTimeout:          time.Millisecond,
-					Heartbeat:                  time.Millisecond * 2,
-					PublishConfirmationTimeout: time.Millisecond * 3,
+					ConnectionTimeout: time.Millisecond,
 				},
-				Routing: RoutingConfig{
-					Exchange:   "amq.direct",
-					RoutingKey: "custom_routing_key",
+				Topic: TopicConfig{
+					Subject: "nats.test.subject",
 				},
 				EncodingExtensionID: &encodingComponentID,
-				Durable:             false,
 				RetrySettings: configretry.BackOffConfig{
 					Enabled: true,
 				},
@@ -78,19 +73,15 @@ func TestLoadConfig(t *testing.T) {
 			id: component.NewIDWithName(metadata.Type, "mandatory_fields"),
 			expected: &Config{
 				Connection: ConnectionConfig{
-					Endpoint: "amqp://localhost:5672",
-					VHost:    "",
+					Endpoint: "nats://localhost:4222",
 					Auth: AuthConfig{
 						Plain: PlainAuth{
 							Username: "user",
 							Password: "pass",
 						},
 					},
-					ConnectionTimeout:          defaultConnectionTimeout,
-					Heartbeat:                  defaultConnectionHeartbeat,
-					PublishConfirmationTimeout: defaultPublishConfirmationTimeout,
+					ConnectionTimeout: defaultConnectionTimeout,
 				},
-				Durable: true,
 				RetrySettings: configretry.BackOffConfig{
 					Enabled: false,
 				},

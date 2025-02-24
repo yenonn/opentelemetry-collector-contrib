@@ -18,21 +18,20 @@ type Message struct {
 
 type Publisher interface {
 	Publish(ctx context.Context, message *Message) error
-	PublishMessages(ctx context.Context, messages []*Message) error
 	Close() error
 }
 
 type NatsPublisher struct {
-	logger *zap.Logger
-	client *nats.NatsClient
-	config nats.NatsConfig
+	logger     *zap.Logger
+	client     *nats.NatsClient
+	natsConfig nats.NatsConfig
 }
 
 func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.NatsConfig) (Publisher, error) {
 	p := &NatsPublisher{
-		logger: logger,
-		client: client,
-		config: config,
+		logger:     logger,
+		client:     client,
+		natsConfig: config,
 	}
 	conn, err := p.client.Connect(config)
 	if err != nil {
@@ -52,22 +51,6 @@ func (p *NatsPublisher) Publish(ctx context.Context, message *Message) error {
 	} else {
 		p.logger.Error("Failed to publish message, client is not connected", zap.Error(errors.New("fail to connect")))
 	}
-	return nil
-}
-
-func (p *NatsPublisher) PublishMessages(ctx context.Context, messages []*Message) error {
-	if p.client.IsConnected() {
-		for _, message := range messages {
-			err := p.client.Connection.Publish(message.Subject, message.Body)
-			if err != nil {
-				p.logger.Error("Failed to publish message", zap.Error(err))
-				return nil
-			}
-		}
-	} else {
-		p.logger.Error("Failed to publish messages, client is not connected", zap.Error(errors.New("fail to connect")))
-	}
-
 	return nil
 }
 
