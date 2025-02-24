@@ -31,7 +31,7 @@ The following settings can be configured:
       - `username` (required): username for authentication
       - `password`: password for authentication
   - `tls` (optional): [TLS configuration](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/configtls.go#L32)
-  - `name` (optional): The name of the connection, visible in in RabbitMQ management interface
+  - `name` (optional): The name of the connection, visible in in NATS management interface
 - `Topic`:
   - `subject` (default = otlp_spans for traces, otlp_metrics for metrics, otlp_logs for logs): Subject used to route exported messages to NATS subscribed consumers
 - `encoding_extension`: (defaults to OTLP protobuf format): ID of the [encoding extension](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/encoding) to use to marshal data
@@ -51,9 +51,9 @@ exporters:
         plain:
           username: user
           password: pass
-    encoding_extension: otlp_encoding/rabbitmq
+    encoding_extension: otlp_encoding/nats
 
 extensions:
-  otlp_encoding/rabbitmq:
+  otlp_encoding/nats:
     protocol: otlp_json
 ```
