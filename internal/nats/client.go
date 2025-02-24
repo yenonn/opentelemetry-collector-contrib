@@ -37,7 +37,13 @@ type client struct {
 func (c *client) Connect(config DialConfig) error {
 	c.logger.Debug("Connecting to nats")
 
-	nc, err := nats.Connect(config.URL, nats.UserInfo(config.Username, config.Password), nats.RootCAs(config.RootCA), nats.Timeout(config.ConnectionTimeout))
+	natsOptions := []nats.Option{
+		nats.UserInfo(config.Username, config.Password),
+		nats.Timeout(config.ConnectionTimeout),
+		nats.RootCAs(config.RootCA),
+	}
+
+	nc, err := nats.Connect(config.URL, natsOptions...)
 	if err != nil {
 		nc.Close()
 		return err
@@ -59,12 +65,4 @@ func (c *client) IsClosed() bool {
 
 func (c *client) IsConnected() bool {
 	return c.Connection.IsConnected()
-}
-
-func (c *client) ReconnectIfUnhealthy(config DialConfig) {
-	hasConnectionError := c.IsConnected()
-	if !hasConnectionError {
-		c.logger.Debug("Reconnecting to nats")
-		c.Connect(config)
-	}
 }
