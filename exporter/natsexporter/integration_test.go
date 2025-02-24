@@ -3,7 +3,7 @@
 
 //go:build integration
 
-package rabbitmqexporter
+package natsexporter
 
 import (
 	"context"

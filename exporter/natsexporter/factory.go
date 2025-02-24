@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-package rabbitmqexporter // import "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/rabbitmqexporter"
+package natsexporter // import "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter"
 
 import (
 	"context"
@@ -14,8 +14,8 @@ import (
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/rabbitmqexporter/internal/metadata"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/rabbitmqexporter/internal/publisher"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/metadata"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/publisher"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/rabbitmq"
 )
 
@@ -70,7 +70,7 @@ func createTracesExporter(
 	if config.Connection.Name != "" {
 		connectionName = config.Connection.Name
 	}
-	r := newRabbitmqExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
+	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
 
 	return exporterhelper.NewTraces(
 		ctx,
@@ -97,7 +97,7 @@ func createMetricsExporter(
 	if config.Connection.Name != "" {
 		connectionName = config.Connection.Name
 	}
-	r := newRabbitmqExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
+	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
 
 	return exporterhelper.NewMetrics(
 		ctx,
@@ -123,7 +123,7 @@ func createLogsExporter(
 	if config.Connection.Name != "" {
 		connectionName = config.Connection.Name
 	}
-	r := newRabbitmqExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
+	r := newNatsExporter(config, set.TelemetrySettings, newPublisherFactory(set), newTLSFactory(config), routingKey, connectionName)
 
 	return exporterhelper.NewLogs(
 		ctx,

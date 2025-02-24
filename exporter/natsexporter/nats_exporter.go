@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-package rabbitmqexporter // import "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/rabbitmqexporter"
+package natsexporter // import "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter"
 
 import (
 	"context"
@@ -17,7 +17,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/rabbitmq"
 )
 
-type rabbitmqExporter struct {
+type natsExporter struct {
 	config *Config
 	tlsFactory
 	settings       component.TelemetrySettings
@@ -33,7 +33,7 @@ type (
 	tlsFactory       = func(context.Context) (*tls.Config, error)
 )
 
-func newRabbitmqExporter(cfg *Config, set component.TelemetrySettings, publisherFactory publisherFactory, tlsFactory tlsFactory, routingKey string, connectionName string) *rabbitmqExporter {
+func newNatsExporter(cfg *Config, set component.TelemetrySettings, publisherFactory publisherFactory, tlsFactory tlsFactory, routingKey string, connectionName string) *rabbitmqExporter {
 	exporter := &rabbitmqExporter{
 		config:           cfg,
 		settings:         set,
@@ -45,7 +45,7 @@ func newRabbitmqExporter(cfg *Config, set component.TelemetrySettings, publisher
 	return exporter
 }
 
-func (e *rabbitmqExporter) start(ctx context.Context, host component.Host) error {
+func (e *natsExporter) start(ctx context.Context, host component.Host) error {
 	m, err := newMarshaler(e.config.EncodingExtensionID, host)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (e *rabbitmqExporter) start(ctx context.Context, host component.Host) error
 	return nil
 }
 
-func (e *rabbitmqExporter) publishTraces(context context.Context, traces ptrace.Traces) error {
+func (e *natsExporter) publishTraces(context context.Context, traces ptrace.Traces) error {
 	body, err := e.tracesMarshaler.MarshalTraces(traces)
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (e *rabbitmqExporter) publishTraces(context context.Context, traces ptrace.
 	return e.publisher.Publish(context, message)
 }
 
-func (e *rabbitmqExporter) publishMetrics(context context.Context, metrics pmetric.Metrics) error {
+func (e *natsExporter) publishMetrics(context context.Context, metrics pmetric.Metrics) error {
 	body, err := e.metricsMarshaler.MarshalMetrics(metrics)
 	if err != nil {
 		return err
@@ -113,7 +113,7 @@ func (e *rabbitmqExporter) publishMetrics(context context.Context, metrics pmetr
 	return e.publisher.Publish(context, message)
 }
 
-func (e *rabbitmqExporter) publishLogs(context context.Context, logs plog.Logs) error {
+func (e *natsExporter) publishLogs(context context.Context, logs plog.Logs) error {
 	body, err := e.logsMarshaler.MarshalLogs(logs)
 	if err != nil {
 		return err
@@ -127,7 +127,7 @@ func (e *rabbitmqExporter) publishLogs(context context.Context, logs plog.Logs) 
 	return e.publisher.Publish(context, message)
 }
 
-func (e *rabbitmqExporter) shutdown(_ context.Context) error {
+func (e *natsExporter) shutdown(_ context.Context) error {
 	if e.publisher != nil {
 		return e.publisher.Close()
 	}
