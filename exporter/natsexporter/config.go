@@ -10,6 +10,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config/configretry"
 	"go.opentelemetry.io/collector/config/configtls"
+	"go.opentelemetry.io/collector/exporter/exporterbatcher"
 )
 
 type Config struct {
@@ -17,6 +18,7 @@ type Config struct {
 	Topic               TopicConfig               `mapstructure:"topic"`
 	EncodingExtensionID *component.ID             `mapstructure:"encoding_extension"`
 	RetrySettings       configretry.BackOffConfig `mapstructure:"retry_on_failure"`
+	BatcherSettings     exporterbatcher.Config    `mapstructure:"batcher"`
 }
 
 type ConnectionConfig struct {

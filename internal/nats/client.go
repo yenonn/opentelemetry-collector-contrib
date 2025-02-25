@@ -49,7 +49,9 @@ func (c *NatsClient) Connect(config NatsConfig) (*nats.Conn, error) {
 	natsOptions := []nats.Option{
 		nats.UserInfo(config.Username, config.Password),
 		nats.Timeout(config.ConnectionTimeout),
-		nats.RootCAs(config.RootCA),
+	}
+	if len(config.RootCA) > 0 {
+		natsOptions = append(natsOptions, nats.RootCAs(config.RootCA))
 	}
 
 	nc, err := nats.Connect(config.URL, natsOptions...)

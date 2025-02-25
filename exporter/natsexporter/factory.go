@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/collector/config/configretry"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/exporter"
+	"go.opentelemetry.io/collector/exporter/exporterbatcher"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/metadata"
@@ -19,9 +20,8 @@ import (
 )
 
 const (
-	defaultConnectionTimeout          = time.Second * 10
-	defaultConnectionHeartbeat        = time.Second * 5
-	defaultPublishConfirmationTimeout = time.Second * 5
+	defaultTopicSubject      = "deadletter.default"
+	defaultConnectionTimeout = time.Second * 10
 
 	deadletterMetricsSubject = "deadletter.otlp_metrics"
 	deadletterSpansSubject   = "deadletter.otlp_spans"
@@ -46,10 +46,17 @@ func createDefaultConfig() component.Config {
 	retrySettings := configretry.BackOffConfig{
 		Enabled: false,
 	}
+	batcherSettings := exporterbatcher.NewDefaultConfig()
+	batcherSettings.Enabled = false
+
 	return &Config{
-		RetrySettings: retrySettings,
+		RetrySettings:   retrySettings,
+		BatcherSettings: batcherSettings,
 		Connection: ConnectionConfig{
 			ConnectionTimeout: defaultConnectionTimeout,
+		},
+		Topic: TopicConfig{
+			Subject: defaultTopicSubject,
 		},
 	}
 }
@@ -77,6 +84,7 @@ func createTracesExporter(
 		exporterhelper.WithStart(r.start),
 		exporterhelper.WithShutdown(r.shutdown),
 		exporterhelper.WithRetry(config.RetrySettings),
+		exporterhelper.WithBatcher(config.BatcherSettings),
 	)
 }
 
@@ -104,6 +112,7 @@ func createMetricsExporter(
 		exporterhelper.WithStart(r.start),
 		exporterhelper.WithShutdown(r.shutdown),
 		exporterhelper.WithRetry(config.RetrySettings),
+		exporterhelper.WithBatcher(config.BatcherSettings),
 	)
 }
 
@@ -130,6 +139,7 @@ func createLogsExporter(
 		exporterhelper.WithStart(r.start),
 		exporterhelper.WithShutdown(r.shutdown),
 		exporterhelper.WithRetry(config.RetrySettings),
+		exporterhelper.WithBatcher(config.BatcherSettings),
 	)
 }
 
