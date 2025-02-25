@@ -12,7 +12,7 @@ nats/all_fields:
 
   topic:
     subjects: ["foo.bar", "foo.bar.baz"]
-  encoding_extension: otlp_encoding/rabbitmq123
+  encoding_extension: otlp_encoding/nats
   retry_on_failure:
     enabled: true
 

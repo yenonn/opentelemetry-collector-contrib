@@ -20,7 +20,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/natsexporter/internal/metadata"
 )
 
-var encodingComponentID = component.NewIDWithName(component.MustNewType("otlp_encoding"), "nats123")
+var encodingComponentID = component.NewIDWithName(component.MustNewType("otlp_encoding"), "nats")
 
 func TestLoadConfig(t *testing.T) {
 	t.Parallel()
@@ -61,7 +61,7 @@ func TestLoadConfig(t *testing.T) {
 					ConnectionTimeout: time.Millisecond,
 				},
 				Topic: TopicConfig{
-					Subject: "nats.test.subject",
+					Subjects: ["nats.test.subject"],
 				},
 				EncodingExtensionID: &encodingComponentID,
 				RetrySettings: configretry.BackOffConfig{
