@@ -12,8 +12,8 @@ import (
 )
 
 type Message struct {
-	Subject string
-	Body    []byte
+	Subjects []string
+	Body     []byte
 }
 
 type Publisher interface {
@@ -43,10 +43,12 @@ func NewNatsPublisher(logger *zap.Logger, client *nats.NatsClient, config nats.N
 
 func (p *NatsPublisher) Publish(ctx context.Context, message *Message) error {
 	if p.client.IsConnected() {
-		err := p.client.Connection.Publish(message.Subject, message.Body)
-		if err != nil {
-			p.logger.Error("Failed to publish message", zap.Error(err))
-			return err
+		for _, subject := range message.Subjects {
+			err := p.client.Connection.Publish(subject, message.Body)
+			if err != nil {
+				p.logger.Error("Failed to publish message", zap.Error(err))
+				return err
+			}
 		}
 	} else {
 		p.logger.Error("Failed to publish message, client is not connected", zap.Error(errors.New("fail to connect")))

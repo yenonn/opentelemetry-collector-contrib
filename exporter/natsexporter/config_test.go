@@ -54,7 +54,7 @@ func TestLoadConfig(t *testing.T) {
 					},
 					TLSConfig: &configtls.ClientConfig{
 						Config: configtls.Config{
-							CAFile: "cert123",
+							CAFile: "/var/lib/myca.pem",
 						},
 						Insecure: true,
 					},

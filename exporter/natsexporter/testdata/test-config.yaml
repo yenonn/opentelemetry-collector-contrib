@@ -11,7 +11,7 @@ nats/all_fields:
     connection_timeout: 1ms
 
   topic:
-    subject: foo.bar
+    subjects: ["foo.bar", "foo.bar.baz"]
   encoding_extension: otlp_encoding/rabbitmq123
   retry_on_failure:
     enabled: true

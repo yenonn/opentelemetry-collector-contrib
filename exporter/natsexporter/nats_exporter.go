@@ -67,8 +67,8 @@ func (e *natsExporter) publishTraces(context context.Context, traces ptrace.Trac
 	}
 
 	message := &publisher.Message{
-		Body:    body,
-		Subject: e.config.Topic.Subject,
+		Body:     body,
+		Subjects: e.config.Topic.Subjects,
 	}
 	return e.publisher.Publish(context, message)
 }
@@ -80,8 +80,8 @@ func (e *natsExporter) publishMetrics(context context.Context, metrics pmetric.M
 	}
 
 	message := &publisher.Message{
-		Body:    body,
-		Subject: e.config.Topic.Subject,
+		Body:     body,
+		Subjects: e.config.Topic.Subjects,
 	}
 	return e.publisher.Publish(context, message)
 }
@@ -93,8 +93,8 @@ func (e *natsExporter) publishLogs(context context.Context, logs plog.Logs) erro
 	}
 
 	message := &publisher.Message{
-		Body:    body,
-		Subject: e.config.Topic.Subject,
+		Body:     body,
+		Subjects: e.config.Topic.Subjects,
 	}
 	return e.publisher.Publish(context, message)
 }

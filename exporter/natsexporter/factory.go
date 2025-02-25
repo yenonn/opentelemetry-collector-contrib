@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	defaultTopicSubject      = "deadletter.default"
+	defaultTopicSubject      = ["deadletter.default"]
 	defaultConnectionTimeout = time.Second * 10
 
 	deadletterMetricsSubject = "deadletter.otlp_metrics"
@@ -56,7 +56,7 @@ func createDefaultConfig() component.Config {
 			ConnectionTimeout: defaultConnectionTimeout,
 		},
 		Topic: TopicConfig{
-			Subject: defaultTopicSubject,
+			Subjects: defaultTopicSubject,
 		},
 	}
 }

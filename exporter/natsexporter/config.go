@@ -30,7 +30,7 @@ type ConnectionConfig struct {
 }
 
 type TopicConfig struct {
-	Subject string `mapstructure:"subject"`
+	Subjects []string `mapstructure:"subjects"`
 }
 
 type AuthConfig struct {
